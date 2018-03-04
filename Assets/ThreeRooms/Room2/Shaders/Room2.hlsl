@@ -1,4 +1,5 @@
 #include "../../Common/Shaders/Common.hlsl"
+#include "../../Common/Shaders/SimplexNoise3D.hlsl"
 
 // Cube map shadow caster; Used to render point light shadows on platforms
 // that lacks depth cube map support.
@@ -7,6 +8,7 @@
 #endif
 
 // Shader uniforms
+uint _Columns;
 half4 _Color;
 half _Glossiness;
 half _Metallic;
@@ -76,77 +78,42 @@ Varyings VertexOutput(float3 position, half3 normal)
     return o;
 }
 
-float3 ConstructNormal(float3 v1, float3 v2, float3 v3)
+float3 GetVertexPos(uint ix, uint iy)
 {
-    return normalize(cross(v2 - v1, v3 - v1) + 1e-5);
+    //float n = snoise(float3(ix, iy, _Time.y) * 0.33);
+    float3 d = snoise_grad(float3(ix, iy, _Time.y / 2)).xyz * 0.3;
+    return float3(ix, iy, 0) + d;
 }
 
-void OutputCube(
-    float3 origin, float3 extent,
-    inout TriangleStream<Varyings> outStream
-)
-{
-    float3 v1 = origin + extent * float3(-1, -1, -1);
-    float3 v2 = origin + extent * float3(+1, -1, -1);
-    float3 v3 = origin + extent * float3(-1, +1, -1);
-    float3 v4 = origin + extent * float3(+1, +1, -1);
-    float3 v5 = origin + extent * float3(-1, -1, +1);
-    float3 v6 = origin + extent * float3(+1, -1, +1);
-    float3 v7 = origin + extent * float3(-1, +1, +1);
-    float3 v8 = origin + extent * float3(+1, +1, +1);
-
-    float3 n1 = ConstructNormal(v1, v2, v3);
-    float3 n2 = ConstructNormal(v1, v3, v5);
-    float3 n3 = ConstructNormal(v1, v5, v8);
-
-    outStream.Append(VertexOutput(v2, -n1));
-    outStream.Append(VertexOutput(v1, -n1));
-    outStream.Append(VertexOutput(v4, -n1));
-    outStream.Append(VertexOutput(v3, -n1));
-    outStream.RestartStrip();
-
-    outStream.Append(VertexOutput(v5, n1));
-    outStream.Append(VertexOutput(v6, n1));
-    outStream.Append(VertexOutput(v7, n1));
-    outStream.Append(VertexOutput(v8, n1));
-    outStream.RestartStrip();
-
-    outStream.Append(VertexOutput(v3, -n2));
-    outStream.Append(VertexOutput(v1, -n2));
-    outStream.Append(VertexOutput(v7, -n2));
-    outStream.Append(VertexOutput(v5, -n2));
-    outStream.RestartStrip();
-
-    outStream.Append(VertexOutput(v2, n2));
-    outStream.Append(VertexOutput(v4, n2));
-    outStream.Append(VertexOutput(v6, n2));
-    outStream.Append(VertexOutput(v8, n2));
-    outStream.RestartStrip();
-
-    outStream.Append(VertexOutput(v1, -n3));
-    outStream.Append(VertexOutput(v2, -n3));
-    outStream.Append(VertexOutput(v5, -n3));
-    outStream.Append(VertexOutput(v6, -n3));
-    outStream.RestartStrip();
-
-    outStream.Append(VertexOutput(v7, n3));
-    outStream.Append(VertexOutput(v8, n3));
-    outStream.Append(VertexOutput(v3, n3));
-    outStream.Append(VertexOutput(v4, n3));
-    outStream.RestartStrip();
-}
-
-[maxvertexcount(24)]
+[maxvertexcount(8)]
 void Geometry(
     triangle Attributes input[3],
     uint pid : SV_PrimitiveID,
     inout TriangleStream<Varyings> outStream
 )
 {
-    float3 p = 0;
-    p.x = sin(_Time * 80 + pid * 0.4) * 0.2;
-    p.y = pid * 0.1;
-    OutputCube(p, float3(1, 0.04, 0.04), outStream);
+    uint columns = clamp(_Columns, 1, 200);
+
+    uint iy = pid / columns;
+    uint ix = pid - iy * columns;
+
+    float3 v1 = GetVertexPos(ix + 0, iy + 0);
+    float3 v2 = GetVertexPos(ix + 1, iy + 0);
+    float3 v3 = GetVertexPos(ix + 0, iy + 1);
+    float3 v4 = GetVertexPos(ix + 1, iy + 1);
+
+    float3 n1 = normalize(cross(v2 - v1, v3 - v1) + 1e-5);
+    float3 n2 = normalize(cross(v4 - v2, v3 - v2) + 1e-5);
+
+    outStream.Append(VertexOutput(v1, n1));
+    outStream.Append(VertexOutput(v2, n1));
+    outStream.Append(VertexOutput(v3, n1));
+    outStream.RestartStrip();
+
+    outStream.Append(VertexOutput(v2, n2));
+    outStream.Append(VertexOutput(v4, n2));
+    outStream.Append(VertexOutput(v3, n2));
+    outStream.RestartStrip();
 }
 
 //
@@ -178,6 +145,11 @@ void Fragment(
     out half4 outEmission : SV_Target3
 )
 {
+    if (input.wposition.x > 2) discard;
+    if (input.wposition.x < -2) discard;
+    if (input.wposition.y < 0.1) discard;
+    if (input.wposition.y > 2.3) discard;
+
     // PBS workflow conversion (metallic -> specular)
     half3 c_diff, c_spec;
     half refl10;
