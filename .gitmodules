@@ -10,3 +10,6 @@
 	path = Packages/jp.keijiro.klakspout
 	url = git@github.com:keijiro/KlakSpout.git
 	branch = upm
+[submodule "Packages/jp.keijiro.ffmpegout"]
+	path = Packages/jp.keijiro.ffmpegout
+	url = git@github.com:keijiro/upm-ffmpegout.git
