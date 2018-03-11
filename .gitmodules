@@ -1,0 +1,4 @@
+[submodule "Packages/jp.keijiro.danish-statues"]
+	path = Packages/jp.keijiro.danish-statues
+	url = git@github.com:keijiro/DanishStatues.git
+	branch = upm
