@@ -6,3 +6,7 @@
 	path = Packages/jp.keijiro.klak
 	url = git@github.com:keijiro/Klak.git
 	branch = upm
+[submodule "Packages/jp.keijiro.klakspout"]
+	path = Packages/jp.keijiro.klakspout
+	url = git@github.com:keijiro/KlakSpout.git
+	branch = upm
