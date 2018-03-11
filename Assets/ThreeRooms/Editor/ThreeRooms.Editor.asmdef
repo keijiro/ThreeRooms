@@ -1,0 +1,12 @@
+{
+    "name": "ThreeRooms.Editor",
+    "references": [
+        "ThreeRooms"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false
+}
