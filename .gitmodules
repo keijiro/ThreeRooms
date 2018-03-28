@@ -21,3 +21,7 @@
 	path = Packages/jp.keijiro.midijack
 	url = git@github.com:keijiro/MidiJack.git
 	branch = upm
+[submodule "Packages/jp.keijiro.three-d-scans"]
+	path = Packages/jp.keijiro.three-d-scans
+	url = git@github.com:keijiro/ThreeDScans.git
+	branch = upm
