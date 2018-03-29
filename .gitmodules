@@ -6,21 +6,6 @@
 	path = Packages/jp.keijiro.klak
 	url = git@github.com:keijiro/Klak.git
 	branch = upm
-[submodule "Packages/jp.keijiro.klakspout"]
-	path = Packages/jp.keijiro.klakspout
-	url = git@github.com:keijiro/KlakSpout.git
-	branch = upm
-[submodule "Packages/jp.keijiro.ffmpegout"]
-	path = Packages/jp.keijiro.ffmpegout
-	url = git@github.com:keijiro/upm-ffmpegout.git
-[submodule "Packages/jp.keijiro.midiklak"]
-	path = Packages/jp.keijiro.midiklak
-	url = git@github.com:keijiro/MidiKlak.git
-	branch = upm
-[submodule "Packages/jp.keijiro.midijack"]
-	path = Packages/jp.keijiro.midijack
-	url = git@github.com:keijiro/MidiJack.git
-	branch = upm
 [submodule "Packages/jp.keijiro.three-d-scans"]
 	path = Packages/jp.keijiro.three-d-scans
 	url = git@github.com:keijiro/ThreeDScans.git
